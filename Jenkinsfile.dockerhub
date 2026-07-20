@@ -119,7 +119,7 @@ pipeline {
             steps {
                 script {
                     def pom = readMavenPom file: 'pom.xml'
-                    def image = "SINVIASOCIAL/${pom.artifactId}"  // ← CAMBIA esto
+                    def image = "sinvidasocial/${pom.artifactId}"  // ← CAMBIA esto
                     
                     sh "docker build -t ${image}:${pom.version} -t ${image}:latest ."
                     sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
