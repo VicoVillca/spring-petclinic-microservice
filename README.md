@@ -155,13 +155,22 @@ ENTRYPOINT [ "java", "-jar", "/workspace/app.jar" ]
 #### 3.2 Verificar Localmente
 
 # Construir imagen
+
+```
 docker build -t sinvidasocial/spring-petclinic-rest:latest .
+```
 
 # Ejecutar contenedor
+
+```
 docker run -p 8080:9966 sinvidasocial/spring-petclinic-rest:latest
+```
 
 # Verificar
+
+```
 curl http://localhost:8080/actuator/health
+```
 
 ---
 
