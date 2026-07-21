@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.8-eclipse-temurin-21'
-        }
-    }
+    agent none
     
     triggers {
         githubPush()
@@ -13,122 +9,135 @@ pipeline {
         MAVEN_OPTS = "-Dmaven.repo.local=${WORKSPACE}/.m2"
         SONAR_USER_HOME = "${WORKSPACE}/.sonar"
     }
-    
+
     stages {
         // ============================================
-        // STAGE 1: COMPILE
+        // STAGE 1: COMPILE (de tu pipeline 1)
         // ============================================
         stage('Compile') {
+            agent {
+                docker {
+                    image 'maven:3.8.8-eclipse-temurin-21'
+                }
+            }
             steps {
                 echo '📦 COMPILANDO PROYECTO...'
                 sh 'mvn clean compile -B -ntp'
-                echo '✅ Compilación completada'
             }
         }
         
         // ============================================
-        // STAGE 2: TEST
+        // STAGE 2: TEST (de tu pipeline 1)
         // ============================================
-        stage('Test') {
+        /*stage('Test') {
+            agent {
+                docker {
+                    image 'maven:3.8.8-eclipse-temurin-21'
+                }
+            }
             steps {
                 echo '🧪 EJECUTANDO TESTS...'
                 sh 'mvn test -B -ntp'
-                echo '✅ Tests completados'
             }
             post {
                 success {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-        }
+        }*/
         
         // ============================================
-        // STAGE 3: COVERAGE
+        // STAGE 3: COVERAGE (de tu pipeline 1)
         // ============================================
-        stage('Coverage') {
+        /*stage('Coverage') {
+            agent {
+                docker {
+                    image 'maven:3.8.8-eclipse-temurin-21'
+                }
+            }
             steps {
                 echo '📊 GENERANDO REPORTE DE COBERTURA...'
                 sh 'mvn jacoco:report -B -ntp'
-                echo '✅ Reporte de cobertura generado'
             }
             post {
                 success {
                     recordCoverage(tools: [[parser: 'JACOCO']])
                 }
             }
-        }
+        }*/
         
         // ============================================
-        // STAGE 4: SONARQUBE
+        // STAGE 4: SONARQUBE (de tu pipeline 1)
         // ============================================
-        stage('SonarQube') {
+        /*stage('SonarQube') {
+            agent {
+                docker {
+                    image 'maven:3.8.8-eclipse-temurin-21'
+                }
+            }
             steps {
                 echo '🔍 ANALIZANDO CÓDIGO CON SONARQUBE...'
                 withSonarQubeEnv('sonarqube') {
                     script {
-                        if (env.CHANGE_ID) {
-                            sh """
-                                mvn sonar:sonar -B -ntp \
-                                -Dsonar.pullrequest.key=${env.CHANGE_ID} \
-                                -Dsonar.pullrequest.branch=${env.CHANGE_BRANCH} \
-                                -Dsonar.pullrequest.base=${env.CHANGE_TARGET}
-                            """
-                        } else {
-                            def branchName = GIT_BRANCH.replaceFirst('^origin/', '')
-                            echo "Branch name: ${branchName}"
-                            sh "mvn sonar:sonar -B -ntp -Dsonar.branch.name=${branchName}"
-                        }
+                        def branchName = GIT_BRANCH.replaceFirst('^origin/', '')
+                        sh "mvn sonar:sonar -B -ntp -Dsonar.branch.name=${branchName}"
                     }
                 }
-                echo '✅ Análisis SonarQube completado'
+            }
+        }*/
+        
+        // ============================================
+        // STAGE 5: PACKAGE (de tu pipeline 2)
+        // ============================================
+        stage('Package') {
+            agent {
+                docker {
+                    image 'maven:3.9.15-eclipse-temurin-21'
+                }
+            }
+            steps {
+                echo '📦 GENERANDO FAT JAR...'
+                sh 'mvn clean package -B -ntp -DskipTests'
             }
         }
         
         // ============================================
-        // STAGE 5: PACKAGE + DEPLOY A ARTIFACTORY
+        // STAGE 6: DOCKERHUB (de tu pipeline 2)
         // ============================================
-        stage('Forma 1 - Artifactory - RtMaven') {
-            steps {
-                echo 'Forma 1 - Artifactory - RtMaven'
-
-                script {
-
-                    sh 'env | sort'
-                    sh 'mvn --version'
-                    env.MAVEN_HOME = '/usr/share/maven'
-
-                    def releases = 'spring-petclinic-rest-release'
-                    def snapshots = 'spring-petclinic-rest-snapshot'
-
-                    def server = Artifactory.server 'artifactory'
-
-                    def rtMaven = Artifactory.newMavenBuild()
-                    rtMaven.deployer server: server, releaseRepo: releases, snapshotRepo: snapshots
-
-                    rtMaven.deployer
-                        .addProperty('build.url', env.RUN_DISPLAY_URL)
-                        .addProperty('build.user', env.USER)
-
-                    def buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -B -ntp -DskipTests'
-                    server.publishBuildInfo buildInfo                    
+        stage('DockerHub') {
+            agent {
+                docker {
+                    image 'docker:29.4.0-cli'
+                    //args '--group-add 988 -v /var/run/docker.sock:/var/run/docker.sock'
+                    args '-u root:root --group-add 988 -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
-        } 
+            environment {
+                DOCKER_CONFIG = "${WORKSPACE}/.docker"
+                DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+            }
+            steps {
+                script {
+                    def pom = readMavenPom file: 'pom.xml'
+                    def image = "sinvidasocial/${pom.artifactId}"  // ← CAMBIA esto
+                    
+                    sh "docker build -t ${image}:${pom.version} -t ${image}:latest ."
+                    sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
+                    sh "docker push ${image}:${pom.version}"
+                    sh "docker push ${image}:latest"
+                    sh 'docker logout'
+                }
+            }
+        }
     }
     
-    // ============================================
-    // POST - ACCIONES FINALES
-    // ============================================
     post {
         success {
             echo '🎉 PIPELINE COMPLETADO EXITOSAMENTE!'
-            echo '📦 Artefacto disponible en Artifactory'
+            echo '🐳 Imagen Docker subida a DockerHub'
         }
         failure {
-            echo '❌ El pipeline falló. Revisa los logs para más detalles.'
-        }
-        always {
-            cleanWs()
+            echo '❌ El pipeline falló. Revisa los logs.'
         }
     }
 }
