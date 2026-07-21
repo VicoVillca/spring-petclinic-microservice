@@ -144,11 +144,13 @@ URL: http://3.91.34.10:9000
 
 El Dockerfile ya está incluido en el repositorio:
 
+```
 FROM eclipse-temurin:21-alpine
 WORKDIR /workspace
 COPY target/spring-petclinic-rest-*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
+```
 
 #### 3.2 Verificar Localmente
 
