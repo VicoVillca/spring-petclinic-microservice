@@ -148,8 +148,8 @@ El Dockerfile ya está incluido en el repositorio:
 FROM eclipse-temurin:21-alpine
 WORKDIR /workspace
 COPY target/spring-petclinic-rest-*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 9966
+ENTRYPOINT [ "java", "-jar", "/workspace/app.jar" ]
 ```
 
 #### 3.2 Verificar Localmente
@@ -158,7 +158,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 docker build -t sinvidasocial/spring-petclinic-rest:latest .
 
 # Ejecutar contenedor
-docker run -p 8080:8080 sinvidasocial/spring-petclinic-rest:latest
+docker run -p 8080:9966 sinvidasocial/spring-petclinic-rest:latest
 
 # Verificar
 curl http://localhost:8080/actuator/health

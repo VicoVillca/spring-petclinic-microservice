@@ -1,5 +1,4 @@
 FROM eclipse-temurin:21-alpine
-# FROM amazoncorretto:21-alpine
 WORKDIR /workspace
 COPY target/spring-petclinic-rest-*.jar app.jar
 EXPOSE 9966
