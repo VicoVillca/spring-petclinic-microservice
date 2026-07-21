@@ -68,6 +68,7 @@ Instalar:
 
 Verificar que Docker está instalado en el servidor Jenkins:
 
+```
 docker --version
 docker ps
 
@@ -75,6 +76,7 @@ Agregar usuario Jenkins al grupo docker:
 
 sudo usermod -aG docker jenkins
 sudo systemctl restart jenkins
+```
 
 #### 1.4 Configurar SonarQube en Jenkins
 
