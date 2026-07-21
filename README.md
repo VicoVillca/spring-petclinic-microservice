@@ -263,6 +263,8 @@ docker run -p 8080:8080 sinvidasocial/spring-petclinic-rest:latest
 # Verificar
 curl http://localhost:8080/actuator/health
 
+---
+
 ## 📂 Estructura del Proyecto
 
 spring-petclinic-microservice/
@@ -322,6 +324,54 @@ docker rm petclinic
 curl http://localhost:8080/actuator/health
 
 ---
+
+## 🔄 Diferencia entre Monolito y Microservicio
+
+| Característica | Monolito (Práctica 1) | Microservicio (Práctica 2) |
+|----------------|----------------------|---------------------------|
+| Artefacto | JAR en Artifactory | Imagen Docker en DockerHub |
+| Despliegue | java -jar app.jar | docker run app |
+| Dependencias | Java instalado en el servidor | Todo dentro del contenedor |
+| Portabilidad | Depende del sistema operativo | Corre en cualquier lado con Docker |
+
+---
+
+## 🐛 Solución de Problemas Comunes
+
+### Error: permission denied while trying to connect to the Docker API
+
+# Agregar usuario Jenkins al grupo docker
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+
+### Error: Login Succeeded pero no sube la imagen
+
+# Verificar que el nombre esté en minúsculas
+# DockerHub solo acepta minúsculas en nombres de usuario e imágenes
+
+### Error: cleanWs con agent none
+
+// Comentar cleanWs() en el post
+post {
+    success { echo 'Pipeline completado' }
+    failure { echo 'Pipeline falló' }
+    // always { cleanWs() }
+}
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT.
+
+---
+
+## 🙏 Agradecimientos
+
+- Spring Framework por el proyecto PetClinic
+- Jenkins por la plataforma de CI/CD
+- Docker por la contenedorización
+- SonarQube por el análisis de calidad
 
 ---
 
