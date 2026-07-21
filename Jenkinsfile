@@ -29,7 +29,7 @@ pipeline {
         // ============================================
         // STAGE 2: TEST (de tu pipeline 1)
         // ============================================
-        /*stage('Test') {
+        stage('Test') {
             agent {
                 docker {
                     image 'maven:3.8.8-eclipse-temurin-21'
@@ -44,12 +44,12 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-        }*/
+        }
         
         // ============================================
-        // STAGE 3: COVERAGE (de tu pipeline 1)
+        // STAGE 3: COVERAGE
         // ============================================
-        /*stage('Coverage') {
+        stage('Coverage') {
             agent {
                 docker {
                     image 'maven:3.8.8-eclipse-temurin-21'
@@ -64,12 +64,12 @@ pipeline {
                     recordCoverage(tools: [[parser: 'JACOCO']])
                 }
             }
-        }*/
+        }
         
         // ============================================
         // STAGE 4: SONARQUBE (de tu pipeline 1)
         // ============================================
-        /*stage('SonarQube') {
+        stage('SonarQube') {
             agent {
                 docker {
                     image 'maven:3.8.8-eclipse-temurin-21'
@@ -84,7 +84,7 @@ pipeline {
                     }
                 }
             }
-        }*/
+        }
         
         // ============================================
         // STAGE 5: PACKAGE (de tu pipeline 2)
@@ -102,13 +102,12 @@ pipeline {
         }
         
         // ============================================
-        // STAGE 6: DOCKERHUB (de tu pipeline 2)
+        // STAGE 6: DOCKERHUB
         // ============================================
         stage('DockerHub') {
             agent {
                 docker {
                     image 'docker:29.4.0-cli'
-                    //args '--group-add 988 -v /var/run/docker.sock:/var/run/docker.sock'
                     args '-u root:root --group-add 988 -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
@@ -119,7 +118,7 @@ pipeline {
             steps {
                 script {
                     def pom = readMavenPom file: 'pom.xml'
-                    def image = "sinvidasocial/${pom.artifactId}"  // ← CAMBIA esto
+                    def image = "sinvidasocial/${pom.artifactId}"
                     
                     sh "docker build -t ${image}:${pom.version} -t ${image}:latest ."
                     sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'

@@ -1,12 +1,3 @@
-# 🐳 Spring PetClinic REST - Microservicio con Docker
-
-[![Java](https://img.shields.io/badge/Java-21-red)](https://adoptium.net/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)](https://spring.io/projects/spring-boot)
-[![Maven](https://img.shields.io/badge/Maven-3.9.15-yellow)](https://maven.apache.org/)
-[![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-blue)](https://www.jenkins.io/)
-[![SonarQube](https://img.shields.io/badge/SonarQube-Quality-4EBCD9)](https://www.sonarqube.org/)
-[![Docker](https://img.shields.io/badge/Docker-Container-2496ED)](https://www.docker.com/)
-[![DockerHub](https://img.shields.io/badge/DockerHub-Image-2496ED)](https://hub.docker.com/r/sinvidasocial/spring-petclinic-rest)
 
 ## 📋 Descripción del Proyecto
 
@@ -34,23 +25,6 @@ Spring PetClinic REST es una API RESTful desarrollada con Spring Boot para la ge
 - ✅ Construcción de imagen Docker
 - ✅ Publicación en DockerHub
 
-## 🛠️ Tecnologías Utilizadas
-
-| Tecnología | Versión | Propósito |
-|------------|---------|-----------|
-| Java | 21 | Lenguaje principal |
-| Spring Boot | 3.2.0 | Framework REST |
-| Spring Data JPA | - | Persistencia |
-| H2 Database | - | Base de datos en memoria |
-| Maven | 3.9.15 | Gestión de dependencias |
-| JUnit 5 | - | Pruebas unitarias |
-| JaCoCo | - | Cobertura de código |
-| **Jenkins** | - | CI/CD Pipeline |
-| **SonarQube** | - | Calidad de código |
-| **Docker** | - | Contenedorización |
-| **DockerHub** | - | Repositorio de imágenes |
-
----
 
 ## 🚀 Guía de Configuración CI/CD
 
@@ -238,11 +212,6 @@ Script Path: Jenkinsfile
 
 URL: http://3.91.34.10:9000/dashboard?id=spring-petclinic-rest
 
-Verificar:
-- ✅ Coverage
-- ✅ Code Smells
-- ✅ Duplications
-- ✅ Security Hotspots
 
 #### 5.3 En DockerHub
 
@@ -288,6 +257,9 @@ El pipeline incluye las siguientes etapas:
 
 stages {
     stage(Compile)          // Compilación del código
+    stage(Test)             // Ejecutamos Test
+    stage(Coverage)         // Reporte de covertura
+    stage(SonarQube)        // Analizamos codigo
     stage(Package)          // Generación de FAT JAR
     stage(DockerHub)        // Build y push a DockerHub
 }
@@ -321,59 +293,9 @@ docker stop petclinic
 docker rm petclinic
 
 # Verificar estado
-curl http://localhost:8080/actuator/health
-
+curl http://localhost:8080
 ---
 
-## 🔄 Diferencia entre Monolito y Microservicio
-
-| Característica | Monolito (Práctica 1) | Microservicio (Práctica 2) |
-|----------------|----------------------|---------------------------|
-| Artefacto | JAR en Artifactory | Imagen Docker en DockerHub |
-| Despliegue | java -jar app.jar | docker run app |
-| Dependencias | Java instalado en el servidor | Todo dentro del contenedor |
-| Portabilidad | Depende del sistema operativo | Corre en cualquier lado con Docker |
-
----
-
-## 🐛 Solución de Problemas Comunes
-
-### Error: permission denied while trying to connect to the Docker API
-
-# Agregar usuario Jenkins al grupo docker
-sudo usermod -aG docker jenkins
-sudo systemctl restart jenkins
-
-### Error: Login Succeeded pero no sube la imagen
-
-# Verificar que el nombre esté en minúsculas
-# DockerHub solo acepta minúsculas en nombres de usuario e imágenes
-
-### Error: cleanWs con agent none
-
-// Comentar cleanWs() en el post
-post {
-    success { echo 'Pipeline completado' }
-    failure { echo 'Pipeline falló' }
-    // always { cleanWs() }
-}
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT.
-
----
-
-## 🙏 Agradecimientos
-
-- Spring Framework por el proyecto PetClinic
-- Jenkins por la plataforma de CI/CD
-- Docker por la contenedorización
-- SonarQube por el análisis de calidad
-
----
 
 ## 👤 Autor
 
