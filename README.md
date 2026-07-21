@@ -236,7 +236,8 @@ curl http://localhost:8080/actuator/health
 
 ## 📂 Estructura del Proyecto
 
-spring-petclinic-microservice/
+```
+spring-petclinic-rest/
 ├── src/
 │   ├── main/
 │   │   ├── java/          # Código fuente
@@ -244,10 +245,11 @@ spring-petclinic-microservice/
 │   └── test/
 │       └── java/          # Pruebas unitarias
 ├── target/                # Artefactos generados
-├── Dockerfile             # Configuración de Docker
-├── Jenkinsfile            # Pipeline CI/CD
+├── Jenkinsfile            # Pipeline CI/CD (¡archivo principal!)
 ├── pom.xml                # Dependencias Maven
 └── README.md              # Documentación
+```
+
 
 ---
 
@@ -255,6 +257,7 @@ spring-petclinic-microservice/
 
 El pipeline incluye las siguientes etapas:
 
+```
 stages {
     stage(Compile)          // Compilación del código
     stage(Test)             // Ejecutamos Test
@@ -263,6 +266,7 @@ stages {
     stage(Package)          // Generación de FAT JAR
     stage(DockerHub)        // Build y push a DockerHub
 }
+```
 
 ---
 
