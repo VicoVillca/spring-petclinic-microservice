@@ -263,8 +263,6 @@ docker run -p 8080:8080 sinvidasocial/spring-petclinic-rest:latest
 # Verificar
 curl http://localhost:8080/actuator/health
 
----
-
 ## 📂 Estructura del Proyecto
 
 spring-petclinic-microservice/
